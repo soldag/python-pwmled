@@ -22,8 +22,8 @@ class RgbLed(Led):
         """
         return self._color
 
-    @update_pwm
     @color.setter
+    @update_pwm
     def color(self, color):
         """
         Set the color of the led.

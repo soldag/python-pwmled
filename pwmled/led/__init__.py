@@ -60,8 +60,8 @@ class Led:
         """
         return self._brightness
 
-    @update_pwm
     @brightness.setter
+    @update_pwm
     def brightness(self, brightness):
         """
         Set the brightness of the led.
