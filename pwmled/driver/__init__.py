@@ -1,4 +1,4 @@
-class Driver:
+class Driver(object):
     """Represents the base class for pwm drivers."""
     def __init__(self, pins, freq=200, **kwargs):
         """

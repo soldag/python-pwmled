@@ -20,7 +20,7 @@ def update_pwm(function):
     return wraps(function)(_decorator)
 
 
-class Led:
+class Led(object):
     """Represents the base class for leds that can be controlled."""
     def __init__(self, driver):
         """
