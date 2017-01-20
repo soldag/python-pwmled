@@ -11,7 +11,7 @@ class RgbLed(Led):
         :param driver: The driver that is used to control the led.
         """
         super(RgbLed, self).__init__(driver)
-        self._color = Color(0, 0, 0)
+        self._color = Color(255, 255, 255)
 
     @property
     def color(self):

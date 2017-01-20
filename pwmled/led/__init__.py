@@ -30,7 +30,7 @@ class Led(object):
         """
         self._driver = driver
         self._is_on = False
-        self._brightness = 0
+        self._brightness = 1
 
     @property
     def is_on(self):
