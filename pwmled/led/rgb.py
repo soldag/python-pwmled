@@ -1,3 +1,5 @@
+from __future__ import division
+
 from pwmled import Color
 from pwmled.led import Led, update_pwm
 
