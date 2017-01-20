@@ -28,14 +28,14 @@ class Driver(object):
         """
         Set pwm values on the controlled pins.
 
-        :param values: Values to set (0-100).
+        :param values: Values to set (0.0-1.0).
         :return:
         """
         if len(values) != len(self.pins):
             raise ValueError('Number of values has to be identical with '
                              'the number of pins.')
-        if not all(0 <= v <= 100 for v in values):
-            raise ValueError('Values have to be between 0 and 100.')
+        if not all(0 <= v <= 1 for v in values):
+            raise ValueError('Values have to be between 0 and 1.')
 
         self._set_pwm(values)
 
@@ -44,7 +44,7 @@ class Driver(object):
         Method stub for setting the pwm values.
 
         Has to be implemented by inheriting classes.
-        :param values: Values to set (0-100).
+        :param values: Values to set (0.0-1.0).
         """
         pass
 
