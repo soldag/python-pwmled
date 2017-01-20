@@ -24,4 +24,4 @@ class Pca9685Driver(Driver):
         :param values: Values to set (0.0-1.0).
         """
         for i in range(len(self.pins)):
-            self._device.set_pwm(self.pins[i], 0, values[i] * self.MAX_VALUE)
+            self._device.set_pwm(self.pins[i], 0, int(round(values[i] * self.MAX_VALUE)))

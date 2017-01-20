@@ -24,7 +24,7 @@ class GpioDriver(Driver):
         :param values: Values to set (0.0-1.0).
         """
         for i in range(len(self._pwms)):
-            self._pwms[i].ChangeDutyCycle(values[i] * self.MAX_VALUE)
+            self._pwms[i].ChangeDutyCycle(int(round(values[i] * self.MAX_VALUE)))
 
     def _stop(self):
         """Stop the driver and release resources."""
