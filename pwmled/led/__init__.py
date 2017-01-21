@@ -20,8 +20,8 @@ def update_pwm(function):
     return wraps(function)(_decorator)
 
 
-class Led(object):
-    """Represents the base class for leds that can be controlled."""
+class SingleLed(object):
+    """Represents a single led that can be controlled."""
     def __init__(self, driver):
         """
         Initialize the led.
@@ -66,7 +66,7 @@ class Led(object):
         """
         Set the brightness of the led.
 
-        :param brightness: The brightness to set (0.0-1.0)
+        :param brightness: The brightness to set (0.0-1.0).
         :return:
         """
         if not 0 <= brightness <= 1:
@@ -74,16 +74,28 @@ class Led(object):
 
         self._brightness = brightness
 
+    def transition(self, duration, **kwargs):
+        """
+        Transition to the specified state of the led.
+
+        :param duration: The duration of the transition.
+        :param kwargs: The state to transition to.
+        """
+        values = self._get_pwm_values(**kwargs)
+        self._driver.transition(duration, values)
+
     def _update_pwm(self):
         """Update the pwm values of the driver regarding the current state."""
-        values = [v * self.brightness for v in self._get_pwm_values()]
-        self._driver.set_pwm(values)
+        self._driver.set_pwm(self._get_pwm_values())
 
-    def _get_pwm_values(self):
+    def _get_pwm_values(self, brightness=None):
         """
-        Method stub for getting the pwm values regarding the current state.
+        Get the pwm values for a specific state of the led.
+        If no state is provided, current state is used.
 
-        Has to be implemented by inheriting classes.
-        :return: The class-specific pwm values.
+        :param brightness: The brightness of the state.
+        :return: The pwm values.
         """
-        return []
+        brightness = brightness or self.brightness
+
+        return [brightness]

@@ -1,17 +1,23 @@
 from __future__ import division
 
-from pwmled.led.rgb import RgbLed
+from pwmled.led.rgb import RgbSingleLed
 
 
-class RgbwLed(RgbLed):
+class RgbwLed(RgbSingleLed):
     """Represents a RGBW led that can be controlled."""
-    def _get_pwm_values(self):
+    def _get_pwm_values(self, color=None, brightness=None):
         """
-        Get the pwm values regarding the current color.
+        Get the pwm values for a specific state of the led.
+        If no state is provided, current state is used.
 
+        :param color: The color of the state.
+        :param brightness: The brightness of the state.
         :return: The pwm values.
         """
-        return [x / 255 for x in self._rgb_to_rgbw(self.color)]
+        color = color or self.color
+        brightness = brightness or self.brightness
+
+        return [(x / 255) * brightness for x in self._rgb_to_rgbw(color)]
 
     @staticmethod
     def _rgb_to_rgbw(color):

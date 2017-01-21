@@ -6,22 +6,26 @@ from pwmled.driver import Driver
 class Pca9685Driver(Driver):
     """Represents a pwm driver, which uses the pins of an PCA9685 I2C board."""
 
-    MAX_VALUE = 4095
+    RESOLUTION = 12
 
-    def _initialize(self, address=0x40):
+    def __init__(self, pins, freq=200, address=0x40):
         """
         Initialize the driver.
 
+        :param pins: The pin numbers, that should be controlled.
+        :param freq: The pwm frequency.
         :param address: The address of the PCA9685.
         """
+        super(Pca9685Driver, self).__init__(pins, self.RESOLUTION, freq)
+
         self._device = PCA9685(address)
         self._device.set_pwm_freq(self.freq)
 
-    def _set_pwm(self, values):
+    def _set_pwm(self, raw_values):
         """
         Set pwm values on the controlled pins.
 
-        :param values: Values to set (0.0-1.0).
+        :param raw_values: Raw values to set (0-4095).
         """
         for i in range(len(self.pins)):
-            self._device.set_pwm(self.pins[i], 0, int(round(values[i] * self.MAX_VALUE)))
+            self._device.set_pwm(self.pins[i], 0, raw_values[i])

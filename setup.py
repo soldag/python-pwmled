@@ -10,7 +10,7 @@ setup(
     author_email='soren.oldag@gmail.com',
     packages=find_packages(),
     install_requires=[
-        'RPi.GPIO',
+        'pigpio',
         'adafruit-pca9685'
     ],
     classifiers=[

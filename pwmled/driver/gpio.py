@@ -1,4 +1,4 @@
-import RPi.GPIO as GPIO
+import pigpio
 
 from pwmled.driver import Driver
 
@@ -6,28 +6,28 @@ from pwmled.driver import Driver
 class GpioDriver(Driver):
     """Represents a pwm driver, which uses GPIOs of a Raspberry Pi."""
 
-    MAX_VALUE = 100
+    RESOLUTION = 8
 
-    def _initialize(self):
-        """Initialize the driver."""
-        self._pwms = []
-        GPIO.setup(self.pins, GPIO.OUT)
-        for pin in self.pins:
-            pwm = GPIO.PWM(pin, self.freq)
-            pwm.start(0)
-            self._pwms.append(pwm)
+    def __init__(self, pins, freq=200):
+        """
+        Initialize the driver.
 
-    def _set_pwm(self, values):
+        :param pins: The pin numbers, that should be controlled.
+        :param freq: The pwm frequency.
+        """
+        super(GpioDriver, self).__init__(pins, self.RESOLUTION, freq)
+
+        self._pi = pigpio.pi()
+
+    def _set_pwm(self, raw_values):
         """
         Set pwm values on the controlled pins.
 
-        :param values: Values to set (0.0-1.0).
+        :param raw_values: Raw values to set (0-255).
         """
-        for i in range(len(self._pwms)):
-            self._pwms[i].ChangeDutyCycle(int(round(values[i] * self.MAX_VALUE)))
+        for i in range(len(self.pins)):
+            self._pi.set_PWM_dutycycle(self.pins[i], raw_values[i])
 
     def _stop(self):
         """Stop the driver and release resources."""
-        for pin in self._pwms:
-            pin.stop()
-        GPIO.cleanup()
+        self._pi.stop()
