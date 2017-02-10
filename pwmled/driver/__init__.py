@@ -98,12 +98,19 @@ class Driver(object):
         :param duration: The duration of the transition.
         :param stages: The stages to be executed during the transition.
         """
+        # Execute last stage immediately if duration is 0
+        if duration == 0:
+            self.set_pwm(stages[-1:])
+            return
+
+        # Calculate steps to take
         steps = len(stages)
         wait = duration / steps
         if wait < self.TRANSITION_MIN_WAIT:
             steps = int(math.floor(duration / self.TRANSITION_MIN_WAIT))
             wait = self.TRANSITION_MIN_WAIT
 
+        # Execute steps
         for step in range(steps):
             start_time = datetime.now()
             progress = step / (steps - 1)
