@@ -100,7 +100,7 @@ class Driver(object):
         """
         # Execute last stage immediately if duration is 0
         if duration == 0:
-            self.set_pwm(stages[-1:])
+            self.set_pwm(stages[-1])
             return
 
         # Calculate steps to take
