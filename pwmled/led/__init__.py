@@ -79,7 +79,8 @@ class SingleLed(object):
         :param brightness: The brightness of the state.
         :return: The pwm values.
         """
-        brightness = brightness or self.brightness
+        if brightness is None:
+            brightness = self.brightness
 
         return [brightness]
 
