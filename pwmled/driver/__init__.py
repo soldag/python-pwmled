@@ -41,7 +41,7 @@ class Driver(object):
         if not all(0 <= v <= 1 for v in values):
             raise ValueError('Values have to be between 0 and 1.')
 
-        self._set_pwm(self._convert_to_raw_pwm(values))
+        self._set_pwm(self._to_raw_pwm(values))
         self.state = values
 
     def _set_pwm(self, values):
@@ -53,36 +53,52 @@ class Driver(object):
         """
         raise NotImplementedError
 
-    def _convert_to_raw_pwm(self, values):
+    def _to_raw_pwm(self, values):
         """
         Convert uniform pwm values to raw, driver-specific values.
 
         :param values: The uniform pwm values (0.0-1.0).
         :return: Converted, driver-specific pwm values.
         """
-        return [int(round(values[i] * self._max_raw_value))
+        return [self._to_single_raw_pwm(values[i])
                 for i in range(len(self.pins))]
 
-    def _convert_to_uniform_pwm(self, values):
+    def _to_single_raw_pwm(self, value):
         """
-        Convert raw pwm values to uniform  values.
+        Convert a single uiform pwm value to raw, driver-specific value.
+
+        :param value: The uniform pwm value (0.0-1.0).
+        :return: Converted, driver-specific pwm value.
+        """
+        return int(round(value * self._max_raw_value))
+
+    def _to_uniform_pwm(self, values):
+        """
+        Convert raw pwm values to uniform values.
 
         :param values: The raw pwm values.
         :return: Converted, uniform pwm values (0.0-1.0).
         """
-        return [values[i] / self._max_raw_value for i in range(len(self.pins))]
+        return [self._to_single_uniform_pwm(values[i])
+                for i in range(len(self.pins))]
 
-    def transition(self, duration, values):
+    def _to_single_uniform_pwm(self, value):
         """
-        Transition from the current values to specified values.
+        Convert a single raw pwm value to uniform value.
+
+        :param value: The raw pwm value.
+        :return: Converted, uniform pwm value (0.0-1.0).
+        """
+        return value / self._max_raw_value
+
+    def transition(self, duration, stages):
+        """
+        Transition through given stages in specified duration.
 
         :param duration: The duration of the transition.
-        :param values: The values to transition to.
+        :param stages: The stages to be executed during the transition.
         """
-        raw_state = self._convert_to_raw_pwm(self.state)
-        raw_values = self._convert_to_raw_pwm(values)
-        steps = max(abs(raw_state[i] - raw_values[i])
-                    for i in range(len(self.pins)))
+        steps = len(stages)
         wait = duration / steps
         if wait < self.TRANSITION_MIN_WAIT:
             steps = int(math.floor(duration / self.TRANSITION_MIN_WAIT))
@@ -90,25 +106,23 @@ class Driver(object):
 
         for step in range(steps):
             start_time = datetime.now()
-            progress = (step + 1) / steps
-            values = [self._interpolate(raw_state[i], raw_values[i], progress)
-                      for i in range(len(self.pins))]
-            self.set_pwm(self._convert_to_uniform_pwm(values))
+            progress = step / (steps - 1)
+            stage = stages[int(math.ceil(progress * (len(stages) - 1)))]
+            self.set_pwm(stage)
             time_delta = datetime.now() - start_time
             time.sleep(max(0, wait - time_delta.total_seconds()))
 
-    @staticmethod
-    def _interpolate(start, end, progress):
+    def steps(self, start, end):
         """
-        Interpolate a value from start to end at a given progress.
+        Get the maximum number of steps the driver needs for a transition.
 
-        :param start: The start value.
-        :param end: The end value.
-        :param progress: The progress.
-        :return: The interpolated value at the given progress.
+        :param start: The start value as uniform pwm value (0.0-1.0).
+        :param end: The end value as uniform pwm value (0.0-1.0).
+        :return: The maximum number of steps.
         """
-        diff = end - start
-        return start + progress * diff
+        raw_start = self._to_single_raw_pwm(start)
+        raw_end = self._to_single_raw_pwm(end)
+        return abs(raw_start - raw_end)
 
     def stop(self):
         """Stop the driver and release resources."""

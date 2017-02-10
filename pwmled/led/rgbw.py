@@ -1,10 +1,11 @@
 from __future__ import division
 
-from pwmled.led.rgb import RgbSingleLed
+from pwmled.led.rgb import RgbLed
 
 
-class RgbwLed(RgbSingleLed):
+class RgbwLed(RgbLed):
     """Represents a RGBW led that can be controlled."""
+
     def _get_pwm_values(self, color=None, brightness=None):
         """
         Get the pwm values for a specific state of the led.
