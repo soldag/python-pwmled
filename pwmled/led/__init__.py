@@ -1,8 +1,8 @@
-"""Single led controller."""
+"""Simple led controller."""
 
 
-class SingleLed(object):
-    """Represents a single led that can be controlled."""
+class SimpleLed(object):
+    """Represents a simple, one-color led that can be controlled."""
 
     def __init__(self, driver):
         """

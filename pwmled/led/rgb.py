@@ -2,10 +2,10 @@
 from __future__ import division
 
 from pwmled import Color
-from pwmled.led import SingleLed
+from pwmled.led import SimpleLed
 
 
-class RgbLed(SingleLed):
+class RgbLed(SimpleLed):
     """Represents a RGB led that can be controlled."""
 
     def __init__(self, driver):
