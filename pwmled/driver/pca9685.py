@@ -1,3 +1,4 @@
+"""PCA9685 pwm driver."""
 from Adafruit_PCA9685 import PCA9685
 
 from pwmled.driver import Driver
@@ -19,7 +20,7 @@ class Pca9685Driver(Driver):
         super(Pca9685Driver, self).__init__(pins, self.RESOLUTION, freq)
 
         self._device = PCA9685(address)
-        self._device.set_pwm_freq(self.freq)
+        self._device.set_pwm_freq(self._freq)
 
     def _set_pwm(self, raw_values):
         """
@@ -27,5 +28,5 @@ class Pca9685Driver(Driver):
 
         :param raw_values: Raw values to set (0-4095).
         """
-        for i in range(len(self.pins)):
-            self._device.set_pwm(self.pins[i], 0, raw_values[i])
+        for i in range(len(self._pins)):
+            self._device.set_pwm(self._pins[i], 0, raw_values[i])

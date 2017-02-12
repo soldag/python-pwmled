@@ -1,3 +1,6 @@
+"""Single led controller."""
+
+
 class SingleLed(object):
     """Represents a single led that can be controlled."""
 
@@ -74,7 +77,8 @@ class SingleLed(object):
     def _get_pwm_values(self, brightness=None):
         """
         Get the pwm values for a specific state of the led.
-        If no state is provided, current state is used.
+
+        If a state argument is omitted, current value is used.
 
         :param brightness: The brightness of the state.
         :return: The pwm values.

@@ -1,3 +1,4 @@
+"""Generic pwm driver."""
 from __future__ import division
 import time
 import math
@@ -14,19 +15,27 @@ class Driver(object):
         """
         Initialize the driver.
 
-        :param pins: The pin numbers, that should be controlled.
+        :param pins: The pin numbers that should be controlled.
         :param resolution: The resolution of the pwm channel.
         :param freq: The pwm frequency.
         """
         if not isinstance(pins, list):
             pins = [pins]
 
-        self.pins = pins
-        self.resolution = resolution
-        self.freq = freq
-        self.state = [0] * len(self.pins)
+        self._pins = pins
+        self._resolution = resolution
+        self._freq = freq
+        self._state = [0] * len(self._pins)
+        self._max_raw_value = math.pow(2, self._resolution) - 1
 
-        self._max_raw_value = math.pow(2, self.resolution) - 1
+    @property
+    def pins(self):
+        """
+        Color property.
+
+        :return: The pins numbers that are controlled.
+        """
+        return self._pins
 
     def set_pwm(self, values):
         """
@@ -35,14 +44,14 @@ class Driver(object):
         :param values: Values to set (0.0-1.0).
         :return:
         """
-        if len(values) != len(self.pins):
+        if len(values) != len(self._pins):
             raise ValueError('Number of values has to be identical with '
                              'the number of pins.')
         if not all(0 <= v <= 1 for v in values):
             raise ValueError('Values must be between 0 and 1.')
 
         self._set_pwm(self._to_raw_pwm(values))
-        self.state = values
+        self._state = values
 
     def _set_pwm(self, values):
         """
@@ -61,7 +70,7 @@ class Driver(object):
         :return: Converted, driver-specific pwm values.
         """
         return [self._to_single_raw_pwm(values[i])
-                for i in range(len(self.pins))]
+                for i in range(len(self._pins))]
 
     def _to_single_raw_pwm(self, value):
         """
@@ -80,7 +89,7 @@ class Driver(object):
         :return: Converted, uniform pwm values (0.0-1.0).
         """
         return [self._to_single_uniform_pwm(values[i])
-                for i in range(len(self.pins))]
+                for i in range(len(self._pins))]
 
     def _to_single_uniform_pwm(self, value):
         """

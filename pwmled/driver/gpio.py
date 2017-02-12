@@ -1,3 +1,4 @@
+"""GPIO pwm driver."""
 import pigpio
 
 from pwmled.driver import Driver
@@ -25,8 +26,8 @@ class GpioDriver(Driver):
 
         :param raw_values: Raw values to set (0-255).
         """
-        for i in range(len(self.pins)):
-            self._pi.set_PWM_dutycycle(self.pins[i], raw_values[i])
+        for i in range(len(self._pins)):
+            self._pi.set_PWM_dutycycle(self._pins[i], raw_values[i])
 
     def _stop(self):
         """Stop the driver and release resources."""

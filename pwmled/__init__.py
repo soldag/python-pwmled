@@ -1,3 +1,4 @@
+"""PWM controlled leds."""
 from collections import namedtuple
 
 

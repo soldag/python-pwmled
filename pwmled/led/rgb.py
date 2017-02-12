@@ -1,3 +1,4 @@
+"""RGB led controller."""
 from __future__ import division
 
 from pwmled import Color
@@ -51,7 +52,8 @@ class RgbLed(SingleLed):
     def _get_pwm_values(self, brightness=None, color=None):
         """
         Get the pwm values for a specific state of the led.
-        If no state is provided, current state is used.
+
+        If a state argument is omitted, current value is used.
 
         :param brightness: The brightness of the state.
         :param color: The color of the state.
