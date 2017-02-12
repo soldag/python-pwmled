@@ -44,9 +44,6 @@ class SingleLed(object):
 
         :param brightness: The brightness to set (0.0-1.0).
         """
-        if not 0 <= brightness <= 1:
-            raise ValueError('Value must be between 0 and 1.')
-
         self.set(brightness=brightness)
 
     def set(self, is_on=None, brightness=None):
@@ -58,7 +55,9 @@ class SingleLed(object):
         """
         if is_on is not None:
             self._is_on = is_on
+
         if brightness is not None:
+            self._assert_is_brightness(brightness)
             self._brightness = brightness
 
         self._update_pwm()
@@ -69,6 +68,7 @@ class SingleLed(object):
             values = self._get_pwm_values()
         else:
             values = [0] * len(self._driver.pins)
+
         self._driver.set_pwm(values)
 
     def _get_pwm_values(self, brightness=None):
@@ -106,9 +106,13 @@ class SingleLed(object):
         :param brightness: The brightness to transition to (0.0-1.0).
         :return: The maximum number of steps.
         """
-        return self._driver.steps(self.brightness, brightness)
+        if brightness is not None:
+            self._assert_is_brightness(brightness)
+            return self._driver.steps(self.brightness, brightness)
 
-    def _transition_stage(self, step, total_steps, brightness):
+        return 0
+
+    def _transition_stage(self, step, total_steps, brightness=None):
         """
         Get a transition stage at a specific step.
 
@@ -117,8 +121,11 @@ class SingleLed(object):
         :param brightness: The brightness to transition to (0.0-1.0).
         :return: The stage at the specific step.
         """
-        brightness = self._interpolate(self.brightness, brightness,
-                                       step, total_steps)
+        if brightness is not None:
+            self._assert_is_brightness(brightness)
+            brightness = self._interpolate(self.brightness, brightness,
+                                           step, total_steps)
+
         return self._get_pwm_values(brightness)
 
     @staticmethod
@@ -135,3 +142,13 @@ class SingleLed(object):
         diff = end - start
         progress = step / (total_steps - 1)
         return start + progress * diff
+
+    @staticmethod
+    def _assert_is_brightness(value):
+        """
+        Assert that the given value is a valid brightness.
+
+        :param value: The value to check.
+        """
+        if not 0 <= value <= 1:
+            raise ValueError('Brightness must be between 0 and 1.')

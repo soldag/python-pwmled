@@ -32,9 +32,6 @@ class RgbLed(SingleLed):
 
         :param color: The color to set.
         """
-        if not all(0 <= x <= 255 for x in color):
-            raise ValueError('Invalid color!')
-
         self.set(color=color)
 
     def set(self, is_on=None, brightness=None, color=None):
@@ -46,11 +43,10 @@ class RgbLed(SingleLed):
         :param color: Color of the led.
         """
         if color is not None:
+            self._assert_is_color(color)
             self._color = color
 
         super(RgbLed, self).set(is_on, brightness)
-
-        return self._get_pwm_values(brightness=brightness, color=color)
 
     def _get_pwm_values(self, brightness=None, color=None):
         """
@@ -77,10 +73,16 @@ class RgbLed(SingleLed):
         :return: The maximum number of steps.
         """
         values = []
-        if color is not None:
-            values += [(self.color[i] / 255, color[i] / 255) for i in range(3)]
         if brightness is not None:
+            self._assert_is_brightness(brightness)
             values.append((self.brightness, brightness))
+
+        if color is not None:
+            self._assert_is_color(color)
+            values += [(self.color[i] / 255, color[i] / 255) for i in range(3)]
+
+        if not values:
+            return 0
 
         return max(self._driver.steps(*args) for args in values)
 
@@ -96,12 +98,27 @@ class RgbLed(SingleLed):
         :return: The stage at the specific step.
         """
         if brightness is not None:
+            self._assert_is_brightness(brightness)
             brightness = self._interpolate(self.brightness, brightness,
                                            step, total_steps)
 
         if color is not None:
+            self._assert_is_color(color)
             color = Color(*[self._interpolate(self.color[i], color[i],
                                               step, total_steps)
                             for i in range(3)])
 
         return self._get_pwm_values(brightness=brightness, color=color)
+
+    @staticmethod
+    def _assert_is_color(value):
+        """
+        Assert that the given value is a valid brightness.
+
+        :param value: The value to check.
+        """
+        if not isinstance(value, tuple) or len(value) != 3:
+            raise ValueError("Color must be a RGB tuple.")
+
+        if not all(0 <= x <= 255 for x in value):
+            raise ValueError("RGB values of color must be between 0 and 255.")

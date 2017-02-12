@@ -39,7 +39,7 @@ class Driver(object):
             raise ValueError('Number of values has to be identical with '
                              'the number of pins.')
         if not all(0 <= v <= 1 for v in values):
-            raise ValueError('Values have to be between 0 and 1.')
+            raise ValueError('Values must be between 0 and 1.')
 
         self._set_pwm(self._to_raw_pwm(values))
         self.state = values
@@ -103,6 +103,10 @@ class Driver(object):
             self.set_pwm(stages[-1])
             return
 
+        # If no stages were passed, nothing has to be done
+        if not stages:
+            return
+
         # Calculate steps to take
         steps = len(stages)
         wait = duration / steps
@@ -127,6 +131,11 @@ class Driver(object):
         :param end: The end value as uniform pwm value (0.0-1.0).
         :return: The maximum number of steps.
         """
+        if not 0 <= start <= 1:
+            raise ValueError('Values must be between 0 and 1.')
+        if not 0 <= end <= 1:
+            raise ValueError('Values must be between 0 and 1.')
+
         raw_start = self._to_single_raw_pwm(start)
         raw_end = self._to_single_raw_pwm(end)
         return abs(raw_start - raw_end)
