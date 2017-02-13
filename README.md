@@ -1,4 +1,4 @@
-# python-pwmled
+# python-pwmled [![PyPI version](https://badge.fury.io/py/pwmled.svg)](https://badge.fury.io/py/pwmled)
 
 `python-pwmled` controls LEDs connected to a micro controller using pulse-width modulation. It supports one-color, RGB and RGBW leds driven by GPIOs of an Raspberry Pi or a PCA9685 controller. 
 
