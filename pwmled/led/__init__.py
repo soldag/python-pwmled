@@ -88,20 +88,32 @@ class SimpleLed(object):
 
         return [brightness]
 
-    def transition(self, duration, **kwargs):
+    def transition(self, duration, is_on=None, **kwargs):
         """
         Transition to the specified state of the led.
 
         :param duration: The duration of the transition.
+        :param is_on: The on-off state to transition to.
         :param kwargs: The state to transition to.
         """
-        total_steps = self._transition_steps(**kwargs)
-        stages = [self._transition_stage(step, total_steps, **kwargs)
+        # Handle transitions with changing on-off-state
+        dest_state = kwargs.copy()
+        if is_on is not None:
+            if is_on and not self.is_on:
+                if 'brightness' not in kwargs:
+                    kwargs['brightness'] = self.brightness
+                    dest_state['brightness'] = self.brightness
+                self.brightness = 0
+            elif not is_on and self.is_on:
+                dest_state['brightness'] = 0
+
+        total_steps = self._transition_steps(**dest_state)
+        stages = [self._transition_stage(step, total_steps, **dest_state)
                   for step in range(total_steps)]
         self._driver.transition(duration, stages)
 
         # Update state properties
-        self.set(**kwargs)
+        self.set(is_on=is_on, **kwargs)
 
     def _transition_steps(self, brightness=None):
         """
