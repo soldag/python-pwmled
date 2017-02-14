@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='pwmled',
-    version='1.0.0',
+    version='1.1.0',
     description='Control LEDs connected to a micro controller using pwm.',
     url='https://github.com/soldag/python-pwmled/',
     license='MIT',
