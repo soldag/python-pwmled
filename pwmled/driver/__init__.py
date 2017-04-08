@@ -9,6 +9,7 @@ from datetime import datetime
 class Driver(object):
     """Represents the base class for pwm drivers."""
 
+    IO_TRIES = 10
     TRANSITION_MIN_WAIT = 0.01
 
     def __init__(self, pins, resolution, freq):
@@ -50,7 +51,13 @@ class Driver(object):
         if not all(0 <= v <= 1 for v in values):
             raise ValueError('Values must be between 0 and 1.')
 
-        self._set_pwm(self._to_raw_pwm(values))
+        for tries in range(self.IO_TRIES):
+            try:
+                self._set_pwm(self._to_raw_pwm(values))
+                break
+            except IOError as error:
+                if tries == self.IO_TRIES - 1:
+                    raise error
         self._state = values
 
     def _set_pwm(self, values):
