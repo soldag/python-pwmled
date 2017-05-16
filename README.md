@@ -16,7 +16,7 @@ cd PIGPIO
 make
 sudo make install
 ```
-Besides the library, the `pigpiod` utility is installed, which starts `pigpio` as daemon. The daemon must be running to when using the `GpioDriver`.
+Besides the library, the `pigpiod` utility is installed, which starts `pigpio` as daemon. The daemon must be running when using the `GpioDriver`.
 ```bash
 sudo pigpiod
 ```
