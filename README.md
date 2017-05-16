@@ -8,6 +8,19 @@
 pip install pwmled
 ```
 
+When directly controlling the GPIOs of a Raspberry Pi using the `GpioDriver`(see [below](#configuration)), the [pigpio C library](https://github.com/joan2937/pigpio) is required. It can be installed with the following commands:
+```bash
+wget abyz.co.uk/rpi/pigpio/pigpio.zip
+unzip pigpio.zip
+cd PIGPIO
+make
+sudo make install
+```
+Besides the library, the `pigpiod` utility is installed, which starts `pigpio` as daemon. The daemon must be running to when using the `GpioDriver`.
+```bash
+sudo pigpiod
+```
+
 # Usage
 ### Configuration
 `python-pwmled` supports several possibilities for connecting LEDs to your micro controller:
