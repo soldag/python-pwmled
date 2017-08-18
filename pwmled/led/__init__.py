@@ -96,24 +96,41 @@ class SimpleLed(object):
         :param is_on: The on-off state to transition to.
         :param kwargs: The state to transition to.
         """
+        if self.is_on or is_on:
+            dest_state = self._prepare_transition(is_on, **kwargs)
+            total_steps = self._transition_steps(**dest_state)
+            stages = [self._transition_stage(step, total_steps, **dest_state)
+                      for step in range(total_steps)]
+            self._driver.transition(duration, stages)
+        else:
+            dest_state = kwargs
+
+        # Update state properties
+        if self.is_on and is_on is False:
+            # If led was turned off, set brightness to initial value afterwards
+            # so that the brightness is restored when it is turned on again
+            dest_state['brightness'] = self.brightness
+        self.set(is_on=is_on, **dest_state)
+
+    def _prepare_transition(self, is_on=None, **kwargs):
+        """
+        Perform pre-transition tasks and construct the destination state.
+
+        :param is_on: The on-off state to transition to.
+        :param kwargs: The state to transition to.
+        :return: The destination state of the transition.
+        """
         # Handle transitions with changing on-off-state
         dest_state = kwargs.copy()
         if is_on is not None:
             if is_on and not self.is_on:
-                if 'brightness' not in kwargs:
-                    kwargs['brightness'] = self.brightness
+                if 'brightness' not in kwargs or kwargs['brightness'] is None:
                     dest_state['brightness'] = self.brightness
                 self.brightness = 0
             elif not is_on and self.is_on:
                 dest_state['brightness'] = 0
 
-        total_steps = self._transition_steps(**dest_state)
-        stages = [self._transition_stage(step, total_steps, **dest_state)
-                  for step in range(total_steps)]
-        self._driver.transition(duration, stages)
-
-        # Update state properties
-        self.set(is_on=is_on, **kwargs)
+        return dest_state
 
     def _transition_steps(self, brightness=None):
         """

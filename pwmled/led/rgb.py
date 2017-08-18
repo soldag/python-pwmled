@@ -66,6 +66,25 @@ class RgbLed(SimpleLed):
 
         return [(x / 255) * brightness for x in color]
 
+    def _prepare_transition(self, is_on=None, brightness=None, color=None):
+        """
+        Perform pre-transition tasks and construct the destination state.
+
+        :param is_on: The on-off state to transition to.
+        :param brightness: The brightness to transition to (0.0-1.0).
+        :param color: The color to transition to.
+        :return: The destination state of the transition.
+        """
+        dest_state = super()._prepare_transition(is_on,
+                                                 brightness=brightness,
+                                                 color=color)
+
+        # Handle transitions from off to on and changing color
+        if is_on and not self.is_on and color is not None:
+            self.color = color
+
+        return dest_state
+
     def _transition_steps(self, brightness=None, color=None):
         """
         Get the maximum number of steps needed for a transition.
