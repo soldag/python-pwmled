@@ -35,19 +35,24 @@ class RgbLed(SimpleLed):
         """
         self.set(color=color)
 
-    def set(self, is_on=None, brightness=None, color=None):
+    def set(self, is_on=None, brightness=None, color=None,
+            cancel_transitions=True):
         """
         Set properties of the led simultaneously before updating pwm values.
 
         :param is_on: On-off state of the led.
         :param brightness: Brightness of the led.
         :param color: Color of the led.
+        :param cancel_transitions: Determines, whether transitions should be cancelled.
         """
+        if cancel_transitions:
+            self._cancel_active_transitions()
+
         if color is not None:
             self._assert_is_color(color)
             self._color = color
 
-        super(RgbLed, self).set(is_on, brightness)
+        super(RgbLed, self).set(is_on, brightness, cancel_transitions=False)
 
     def _get_pwm_values(self, brightness=None, color=None):
         """
@@ -75,9 +80,9 @@ class RgbLed(SimpleLed):
         :param color: The color to transition to.
         :return: The destination state of the transition.
         """
-        dest_state = super()._prepare_transition(is_on,
-                                                 brightness=brightness,
-                                                 color=color)
+        dest_state = super(RgbLed, self)._prepare_transition(is_on,
+                                                             brightness=brightness,
+                                                             color=color)
 
         # Handle transitions from off to on and changing color
         if is_on and not self.is_on and color is not None:
@@ -129,7 +134,7 @@ class RgbLed(SimpleLed):
                                               step, total_steps)
                             for i in range(3)])
 
-        return self._get_pwm_values(brightness=brightness, color=color)
+        return {'brightness': brightness, 'color': color}
 
     @staticmethod
     def _assert_is_color(value):

@@ -107,12 +107,14 @@ class Driver(object):
         """
         return value / self._max_raw_value
 
-    def transition(self, duration, stages):
+    def transition(self, duration, stages, cancellation_token):
         """
         Transition through given stages in specified duration.
 
         :param duration: The duration of the transition.
         :param stages: The stages to be executed during the transition.
+        :param cancellation_token: Token used for cancelling the transition.
+        :return: The index of the last applied stage.
         """
         # Execute last stage immediately if duration is 0
         if duration == 0:
@@ -131,13 +133,24 @@ class Driver(object):
             wait = self.TRANSITION_MIN_WAIT
 
         # Execute steps
+        stage_index = 0
         for step in range(steps):
+            # Abort transition, if cancellation was requested
+            if cancellation_token.is_cancellation_requested:
+                return stage_index
+
+            # Apply stage
             start_time = datetime.now()
             progress = step / (steps - 1)
-            stage = stages[int(math.ceil(progress * (len(stages) - 1)))]
+            stage_index = int(math.ceil(progress * (len(stages) - 1)))
+            stage = stages[stage_index]
             self.set_pwm(stage)
+
+            # Wait calculated interval minus time needed for applying the stage
             time_delta = datetime.now() - start_time
             time.sleep(max(0, wait - time_delta.total_seconds()))
+
+        return stage_index
 
     def steps(self, start, end):
         """
