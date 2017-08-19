@@ -174,7 +174,7 @@ class SimpleLed(object):
             if is_on and not self.is_on:
                 if 'brightness' not in kwargs or kwargs['brightness'] is None:
                     dest_state['brightness'] = self.brightness
-                self.brightness = 0
+                self.set(brightness=0, cancel_transitions=False)
             elif not is_on and self.is_on:
                 dest_state['brightness'] = 0
 

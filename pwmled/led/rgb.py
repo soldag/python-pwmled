@@ -86,7 +86,7 @@ class RgbLed(SimpleLed):
 
         # Handle transitions from off to on and changing color
         if is_on and not self.is_on and color is not None:
-            self.color = color
+            self.set(color=color, cancel_transitions=False)
 
         return dest_state
 
