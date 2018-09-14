@@ -1,5 +1,7 @@
 """Simple led controller."""
 
+from functools import partial
+
 from pwmled import CancellationToken
 
 
@@ -111,21 +113,7 @@ class SimpleLed(object):
         self._active_transitions.append(cancellation_token)
 
         # Perform the actual transition
-        dest_state = self._perform_transition(duration, is_on, kwargs,
-                                              cancellation_token)
-
-        # Update state properties
-        if self.is_on and is_on is False:
-            # If led was turned off, set brightness to initial value afterwards
-            # so that the brightness is restored when it is turned on again
-            dest_state['brightness'] = self.brightness
-        self.set(is_on=is_on, cancel_transitions=False, **dest_state)
-
-        # Remove cancellation token from active transitions and confirm
-        # cancellation, if requested
-        self._active_transitions.remove(cancellation_token)
-        if cancellation_token.is_cancellation_requested:
-            cancellation_token.confirm_cancellation()
+        self._perform_transition(duration, is_on, kwargs, cancellation_token)
 
     def _cancel_active_transitions(self):
         """Cancel active transitions and wait for their exit."""
@@ -150,15 +138,40 @@ class SimpleLed(object):
                             for step in range(total_steps)]
             pwm_stages = [self._get_pwm_values(**stage)
                           for stage in state_stages]
-            stage_index = self._driver.transition(duration, pwm_stages,
-                                                  cancellation_token)
+            callback = partial(self._transition_callback, is_on, dest_state,
+                               cancellation_token, state_stages)
 
-            # If transition was cancelled early, use last applied stage as
-            # destination state
-            if cancellation_token.is_cancellation_requested:
-                dest_state = state_stages[stage_index]
+            self._driver.transition(duration, pwm_stages, cancellation_token,
+                                    callback=callback)
 
-        return dest_state
+    def _transition_callback(self, is_on, dest_state, cancellation_token,
+                             state_stages, stage_index):
+        """
+        Callback that is called when a transition has ended.
+
+        :param is_on: The on-off state to transition to.
+        :param dest_state: The state to transition to.
+        :param cancellation_token: Token used for cancelling the transition.
+        :param state_stages: The calculates stages of the transition.
+        :param stage_index: The index of the stage the transition has ended.
+        """
+        # If transition was cancelled early, use last applied stage as
+        # destination state
+        if cancellation_token.is_cancellation_requested:
+            dest_state = state_stages[stage_index]
+
+        # Update state properties
+        if self.is_on and is_on is False:
+            # If led was turned off, set brightness to initial value afterwards
+            # so that the brightness is restored when it is turned on again
+            dest_state['brightness'] = self.brightness
+        self.set(is_on=is_on, cancel_transitions=False, **dest_state)
+
+        # Remove cancellation token from active transitions and confirm
+        # cancellation, if requested
+        self._active_transitions.remove(cancellation_token)
+        if cancellation_token.is_cancellation_requested:
+            cancellation_token.confirm_cancellation()
 
     def _prepare_transition(self, is_on=None, **kwargs):
         """

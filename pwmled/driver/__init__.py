@@ -2,6 +2,7 @@
 from __future__ import division
 import time
 import math
+import threading
 
 from datetime import datetime
 
@@ -107,22 +108,43 @@ class Driver(object):
         """
         return value / self._max_raw_value
 
-    def transition(self, duration, stages, cancellation_token):
+    def transition(self, *args, callback=None, blocking=False):
         """
         Transition through given stages in specified duration.
 
         :param duration: The duration of the transition.
         :param stages: The stages to be executed during the transition.
         :param cancellation_token: Token used for cancelling the transition.
-        :return: The index of the last applied stage.
+        :param blocking: Determines if the transition should block the thread.
+        :param callback: Callback that is called when transition has finished.
+        """
+        if blocking:
+            self._transition(*args, callback=callback)
+        else:
+            thread = threading.Thread(target=self._transition,
+                                      args=args,
+                                      kwargs={'callback': callback})
+            thread.setDaemon(True)
+            thread.start()
+
+    def _transition(self, duration, stages, cancellation_token, callback=None):
+        """
+        Transition through given stages in specified duration.
+
+        :param duration: The duration of the transition.
+        :param stages: The stages to be executed during the transition.
+        :param cancellation_token: Token used for cancelling the transition.
+        :param callback: Callback that is called when transition has finished.
         """
         # Execute last stage immediately if duration is 0
         if duration == 0:
             self.set_pwm(stages[-1])
+            callback()
             return
 
         # If no stages were passed, nothing has to be done
         if not stages:
+            callback()
             return
 
         # Calculate steps to take
@@ -137,7 +159,8 @@ class Driver(object):
         for step in range(steps):
             # Abort transition, if cancellation was requested
             if cancellation_token.is_cancellation_requested:
-                return stage_index
+                callback(stage_index)
+                return
 
             # Apply stage
             start_time = datetime.now()
@@ -150,7 +173,7 @@ class Driver(object):
             time_delta = datetime.now() - start_time
             time.sleep(max(0, wait - time_delta.total_seconds()))
 
-        return stage_index
+        callback(stage_index)
 
     def steps(self, start, end):
         """
