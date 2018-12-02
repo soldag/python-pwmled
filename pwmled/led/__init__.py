@@ -97,7 +97,7 @@ class SimpleLed(object):
 
         return [brightness]
 
-    def transition(self, duration, is_on=None, **kwargs):
+    def transition(self, duration, is_on=None, blocking=False, **kwargs):
         """
         Transition to the specified state of the led.
 
@@ -105,6 +105,7 @@ class SimpleLed(object):
 
         :param duration: The duration of the transition.
         :param is_on: The on-off state to transition to.
+        :param blocking: Determines if the transition should block the thread.
         :param kwargs: The state to transition to.
         """
         # Cancel active transitions and register cancellation token of current
@@ -113,7 +114,8 @@ class SimpleLed(object):
         self._active_transitions.append(cancellation_token)
 
         # Perform the actual transition
-        self._perform_transition(duration, is_on, kwargs, cancellation_token)
+        self._perform_transition(duration, is_on, kwargs,
+                                 cancellation_token, blocking)
 
     def _cancel_active_transitions(self):
         """Cancel active transitions and wait for their exit."""
@@ -121,7 +123,7 @@ class SimpleLed(object):
             transition.request_cancellation(timeout=1)
 
     def _perform_transition(self, duration, is_on, dest_state,
-                            cancellation_token):
+                            cancellation_token, blocking):
         """
         Perform the actual transition to the specified state of the led.
 
@@ -129,6 +131,7 @@ class SimpleLed(object):
         :param is_on: The on-off state to transition to.
         :param dest_state: The state to transition to.
         :param cancellation_token: Token used for cancelling the transition.
+        :param blocking: Determines if the transition should block the thread.
         :return: The state of the led at the moment of return.
         """
         if self.is_on or is_on:
@@ -142,7 +145,7 @@ class SimpleLed(object):
                                cancellation_token, state_stages)
 
             self._driver.transition(duration, pwm_stages, cancellation_token,
-                                    callback=callback)
+                                    callback=callback, blocking=blocking)
 
     def _transition_callback(self, is_on, dest_state, cancellation_token,
                              state_stages, stage_index):
