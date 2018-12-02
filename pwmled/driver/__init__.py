@@ -139,12 +139,12 @@ class Driver(object):
         # Execute last stage immediately if duration is 0
         if duration == 0:
             self.set_pwm(stages[-1])
-            callback()
+            self._call_if_present(callback, len(stages) - 1)
             return
 
         # If no stages were passed, nothing has to be done
         if not stages:
-            callback()
+            self._call_if_present(callback, 0)
             return
 
         # Calculate steps to take
@@ -159,7 +159,7 @@ class Driver(object):
         for step in range(steps):
             # Abort transition, if cancellation was requested
             if cancellation_token.is_cancellation_requested:
-                callback(stage_index)
+                self._call_if_present(callback, stage_index)
                 return
 
             # Apply stage
@@ -173,7 +173,12 @@ class Driver(object):
             time_delta = datetime.now() - start_time
             time.sleep(max(0, wait - time_delta.total_seconds()))
 
-        callback(stage_index)
+        self._call_if_present(callback, stage_index)
+
+    @staticmethod
+    def _call_if_present(callback, *args, **kwargs):
+        if callback:
+            callback(*args, **kwargs)
 
     def steps(self, start, end):
         """
