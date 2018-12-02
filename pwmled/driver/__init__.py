@@ -11,7 +11,7 @@ class Driver(object):
     """Represents the base class for pwm drivers."""
 
     IO_TRIES = 10
-    TRANSITION_MIN_WAIT = 0.01
+    TRANSITION_MIN_WAIT = 0.08
 
     def __init__(self, pins, resolution, freq):
         """
