@@ -14,7 +14,7 @@ class RgbLed(SimpleLed):
 
         :param driver: The driver that is used to control the led.
         """
-        super(RgbLed, self).__init__(driver)
+        super().__init__(driver)
         self._color = Color(255, 255, 255)
 
     @property
@@ -43,7 +43,7 @@ class RgbLed(SimpleLed):
         :param is_on: On-off state of the led.
         :param brightness: Brightness of the led.
         :param color: Color of the led.
-        :param cancel_transitions: Determines, whether transitions should be cancelled.
+        :param cancel_transitions: Cancel active transitions.
         """
         if cancel_transitions:
             self._cancel_active_transitions()
@@ -52,7 +52,7 @@ class RgbLed(SimpleLed):
             self._assert_is_color(color)
             self._color = color
 
-        super(RgbLed, self).set(is_on, brightness, cancel_transitions=False)
+        super().set(is_on, brightness, cancel_transitions=False)
 
     def _get_pwm_values(self, brightness=None, color=None):
         """
@@ -80,9 +80,9 @@ class RgbLed(SimpleLed):
         :param color: The color to transition to.
         :return: The destination state of the transition.
         """
-        dest_state = super(RgbLed, self)._prepare_transition(is_on,
-                                                             brightness=brightness,
-                                                             color=color)
+        dest_state = super()._prepare_transition(is_on,
+                                                 brightness=brightness,
+                                                 color=color)
 
         # Handle transitions from off to on and changing color
         if is_on and not self.is_on and color is not None:

@@ -2,10 +2,11 @@
 
 from functools import partial
 
-from pwmled.transitions import TransitionManager, Transition
+from pwmled.transitions.transition import Transition
+from pwmled.transitions.transition_manager import TransitionManager
 
 
-class SimpleLed(object):
+class SimpleLed:
     """Represents a simple, one-color led that can be controlled."""
 
     def __init__(self, driver):
@@ -60,7 +61,7 @@ class SimpleLed(object):
 
         :param is_on: On-off state of the led.
         :param brightness: Brightness of the led.
-        :param cancel_transitions: Determines, whether transitions should be cancelled.
+        :param cancel_transitions: Cancel active transitions.
         """
         if cancel_transitions:
             self._cancel_active_transitions()

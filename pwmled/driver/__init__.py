@@ -2,7 +2,8 @@
 from __future__ import division
 import math
 
-class Driver(object):
+
+class Driver:
     """Represents the base class for pwm drivers."""
 
     IO_TRIES = 10

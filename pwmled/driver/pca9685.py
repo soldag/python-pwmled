@@ -17,7 +17,7 @@ class Pca9685Driver(Driver):
         :param freq: The pwm frequency.
         :param address: The address of the PCA9685.
         """
-        super(Pca9685Driver, self).__init__(pins, self.RESOLUTION, freq)
+        super().__init__(pins, self.RESOLUTION, freq)
 
         self._device = PCA9685(address)
         self._device.set_pwm_freq(self._freq)

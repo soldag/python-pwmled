@@ -16,7 +16,7 @@ class GpioDriver(Driver):
         :param pins: The pin numbers, that should be controlled.
         :param freq: The pwm frequency.
         """
-        super(GpioDriver, self).__init__(pins, self.RESOLUTION, freq)
+        super().__init__(pins, self.RESOLUTION, freq)
 
         self._pi = pigpio.pi()
 
