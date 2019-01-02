@@ -1,17 +1,11 @@
 """Generic pwm driver."""
 from __future__ import division
-import time
 import math
-import threading
-
-from datetime import datetime
-
 
 class Driver(object):
     """Represents the base class for pwm drivers."""
 
     IO_TRIES = 10
-    TRANSITION_MIN_WAIT = 0.08
 
     def __init__(self, pins, resolution, freq):
         """
@@ -107,78 +101,6 @@ class Driver(object):
         :return: Converted, uniform pwm value (0.0-1.0).
         """
         return value / self._max_raw_value
-
-    def transition(self, *args, callback=None, blocking=False):
-        """
-        Transition through given stages in specified duration.
-
-        :param duration: The duration of the transition.
-        :param stages: The stages to be executed during the transition.
-        :param cancellation_token: Token used for cancelling the transition.
-        :param blocking: Determines if the transition should block the thread.
-        :param callback: Callback that is called when transition has finished.
-        """
-        if blocking:
-            self._transition(*args, callback=callback)
-        else:
-            thread = threading.Thread(target=self._transition,
-                                      args=args,
-                                      kwargs={'callback': callback})
-            thread.setDaemon(True)
-            thread.start()
-
-    def _transition(self, duration, stages, cancellation_token, callback=None):
-        """
-        Transition through given stages in specified duration.
-
-        :param duration: The duration of the transition.
-        :param stages: The stages to be executed during the transition.
-        :param cancellation_token: Token used for cancelling the transition.
-        :param callback: Callback that is called when transition has finished.
-        """
-        # Execute last stage immediately if duration is 0
-        if duration == 0:
-            self.set_pwm(stages[-1])
-            self._call_if_present(callback, len(stages) - 1)
-            return
-
-        # If no stages were passed, nothing has to be done
-        if not stages:
-            self._call_if_present(callback, 0)
-            return
-
-        # Calculate steps to take
-        steps = len(stages)
-        wait = duration / steps
-        if wait < self.TRANSITION_MIN_WAIT:
-            steps = int(math.floor(duration / self.TRANSITION_MIN_WAIT))
-            wait = self.TRANSITION_MIN_WAIT
-
-        # Execute steps
-        stage_index = 0
-        for step in range(steps):
-            # Abort transition, if cancellation was requested
-            if cancellation_token.is_cancellation_requested:
-                self._call_if_present(callback, stage_index)
-                return
-
-            # Apply stage
-            start_time = datetime.now()
-            progress = step / (steps - 1)
-            stage_index = int(math.ceil(progress * (len(stages) - 1)))
-            stage = stages[stage_index]
-            self.set_pwm(stage)
-
-            # Wait calculated interval minus time needed for applying the stage
-            time_delta = datetime.now() - start_time
-            time.sleep(max(0, wait - time_delta.total_seconds()))
-
-        self._call_if_present(callback, stage_index)
-
-    @staticmethod
-    def _call_if_present(callback, *args, **kwargs):
-        if callback:
-            callback(*args, **kwargs)
 
     def steps(self, start, end):
         """

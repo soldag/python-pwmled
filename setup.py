@@ -11,7 +11,8 @@ setup(
     packages=find_packages(),
     install_requires=[
         'pigpio==1.35',
-        'Adafruit-PCA9685==1.0.1'
+        'Adafruit-PCA9685==1.0.1',
+        'python-singleton==0.1.2',
     ],
     classifiers=[
         'License :: OSI Approved :: MIT License',
