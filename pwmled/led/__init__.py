@@ -18,7 +18,7 @@ class SimpleLed:
         self._driver = driver
         self._is_on = False
         self._brightness = 1
-        self._active_transitions = []
+        self._active_transition = None
 
     @property
     def is_on(self):
@@ -55,16 +55,16 @@ class SimpleLed:
         """
         self.set(brightness=brightness)
 
-    def set(self, is_on=None, brightness=None, cancel_transitions=True):
+    def set(self, is_on=None, brightness=None, cancel_transition=True):
         """
         Set properties of the led simultaneously before updating pwm values.
 
         :param is_on: On-off state of the led.
         :param brightness: Brightness of the led.
-        :param cancel_transitions: Cancel active transitions.
+        :param cancel_transition: Cancel active transitions.
         """
-        if cancel_transitions:
-            self._cancel_active_transitions()
+        if cancel_transition:
+            self._cancel_active_transition()
 
         if is_on is not None:
             self._is_on = is_on
@@ -108,7 +108,7 @@ class SimpleLed:
         :param is_on: The on-off state to transition to.
         :param kwargs: The state to transition to.
         """
-        self._cancel_active_transitions()
+        self._cancel_active_transition()
 
         dest_state = self._prepare_transition(is_on, **kwargs)
         total_steps = self._transition_steps(**dest_state)
@@ -117,18 +117,18 @@ class SimpleLed:
         pwm_stages = [self._get_pwm_values(**stage)
                       for stage in state_stages]
         callback = partial(self._transition_callback, is_on)
-        transition = Transition(self._driver, duration, state_stages,
-                                pwm_stages, callback)
+        self._active_transition = Transition(self._driver, duration,
+                                             state_stages, pwm_stages,
+                                             callback)
 
-        self._active_transitions.append(transition)
-        TransitionManager().execute(transition)
+        TransitionManager().execute(self._active_transition)
 
-        return transition
+        return self._active_transition
 
-    def _cancel_active_transitions(self):
-        """Cancel active transitions and wait for their exit."""
-        for transition in self._active_transitions:
-            transition.cancel(timeout=1)
+    def _cancel_active_transition(self):
+        if self._active_transition:
+            self._active_transition.cancel()
+            self._active_transition = None
 
     def _transition_callback(self, is_on, transition):
         """
@@ -138,15 +138,15 @@ class SimpleLed:
         :param transition: The transition that has ended.
         """
         # Update state properties
-        state = transition.state_stages[transition.stage_index]
-        if self.is_on and is_on is False:
-            # If led was turned off, set brightness to initial value afterwards
-            # so that the brightness is restored when it is turned on again
-            state['brightness'] = self.brightness
-        self.set(is_on=is_on, cancel_transitions=False, **state)
+        if transition.state_stages:
+            state = transition.state_stages[transition.stage_index]
+            if self.is_on and is_on is False:
+                # If led was turned off, set brightness to initial value
+                # so that the brightness is restored when it is turned on again
+                state['brightness'] = self.brightness
+            self.set(is_on=is_on, cancel_transition=False, **state)
 
-        # Remove transition from active transitions
-        self._active_transitions.remove(transition)
+        self._active_transition = None
 
     def _prepare_transition(self, is_on=None, **kwargs):
         """
@@ -162,7 +162,7 @@ class SimpleLed:
             if is_on and not self.is_on:
                 if 'brightness' not in kwargs or kwargs['brightness'] is None:
                     dest_state['brightness'] = self.brightness
-                self.set(brightness=0, cancel_transitions=False)
+                self.set(brightness=0, cancel_transition=False)
             elif not is_on and self.is_on:
                 dest_state['brightness'] = 0
 

@@ -3,8 +3,6 @@ import time
 import math
 import threading
 
-from pwmled.transitions.cancellation_token import CancellationToken
-
 
 class Transition:
     """Represents a transition of a led."""
@@ -27,17 +25,18 @@ class Transition:
         self.pwm_stages = pwm_stages
 
         self.stage_index = 0
+        self.cancelled = False
         self.finished = False
         self._finish_event = threading.Event()
         self._start_time = time.time()
-        self._cancellation_token = CancellationToken()
 
     def step(self):
         """Apply the current stage of the transition based on current time."""
-        if self._cancellation_token.is_cancellation_requested:
-            self._finish()
+        if self.cancelled or self.finished:
+            return
 
-        if self.finished:
+        if not self.pwm_stages:
+            self._finish()
             return
 
         if self.duration == 0:
@@ -67,10 +66,9 @@ class Transition:
         """
         self._finish_event.wait(timeout=timeout)
 
-    def cancel(self, timeout=None):
+    def cancel(self):
         """
         Cancel the transition.
-
-        :param timeout: Timeout of the operation in seconds.
         """
-        self._cancellation_token.request_cancellation(timeout=timeout)
+        self._finish()
+        self.cancelled = True
