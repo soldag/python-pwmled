@@ -9,16 +9,20 @@ class GpioDriver(Driver):
 
     RESOLUTION = 8
 
-    def __init__(self, pins, freq=200):
+    def __init__(self, pins, freq=200, host=None):
         """
         Initialize the driver.
 
         :param pins: The pin numbers, that should be controlled.
         :param freq: The pwm frequency.
+        :param host: The host name of the Pi on which the pigpio daemon is running.
         """
         super().__init__(pins, self.RESOLUTION, freq)
 
-        self._pi = pigpio.pi()
+        if host is not None:
+            self._pi = pigpio.pi(host)
+        else:
+            self._pi = pigpio.pi()
 
     def _set_pwm(self, raw_values):
         """

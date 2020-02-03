@@ -34,6 +34,8 @@ from pwmled.driver.pca9685 import Pca9685Driver
 # GPIO driver, which controls pins 17, 22, 23
 driver = GpioDriver([17, 22, 23])
 driver = GpioDriver([17, 22, 23], freq=200)
+# To control the pigpio on a other machine use the host parameter
+driver = GpioDriver([17, 22, 23], host='other.host')
 
 # PCA9685 driver which controls pins 1, 2, 3
 driver = Pca9685Driver([1, 2, 3])
