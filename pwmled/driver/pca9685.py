@@ -1,5 +1,7 @@
 """PCA9685 pwm driver."""
-from Adafruit_PCA9685 import PCA9685
+import board
+import busio
+import adafruit_pca9685
 
 from pwmled.driver import Driver
 
@@ -7,7 +9,7 @@ from pwmled.driver import Driver
 class Pca9685Driver(Driver):
     """Represents a pwm driver, which uses the pins of an PCA9685 I2C board."""
 
-    RESOLUTION = 12
+    RESOLUTION = 16
 
     def __init__(self, pins, freq=200, address=0x40):
         """
@@ -19,14 +21,20 @@ class Pca9685Driver(Driver):
         """
         super().__init__(pins, self.RESOLUTION, freq)
 
-        self._device = PCA9685(address)
-        self._device.set_pwm_freq(self._freq)
+        i2c = busio.I2C(board.SCL, board.SDA)
+        self._device = adafruit_pca9685.PCA9685(i2c, address=address)
+        self._device.frequency = self._freq
 
     def _set_pwm(self, raw_values):
         """
         Set pwm values on the controlled pins.
 
-        :param raw_values: Raw values to set (0-4095).
+        :param raw_values: Raw values to set (0-65535).
         """
         for i in range(len(self._pins)):
-            self._device.set_pwm(self._pins[i], 0, raw_values[i])
+            channel = self._device.channels[self._pins[i]]
+            channel.duty_cycle = raw_values[i]
+
+    def _stop(self):
+        """Stop the driver and release resources."""
+        self._device.deinit()

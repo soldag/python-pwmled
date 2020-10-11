@@ -11,7 +11,8 @@ setup(
     packages=find_packages(),
     install_requires=[
         'pigpio==1.35',
-        'Adafruit-PCA9685==1.0.1',
+        'adafruit-blinka==5.5.1',
+        'adafruit-circuitpython-pca9685==3.3.2',
         'python-singleton==0.1.2',
     ],
     classifiers=[
