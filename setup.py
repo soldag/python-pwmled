@@ -1,9 +1,15 @@
 from setuptools import setup, find_packages
 
+
+with open('README.md', 'r') as f:
+    long_description = f.read()
+
 setup(
     name='pwmled',
     version='1.5.1',
     description='Control LEDs connected to a micro controller using pwm.',
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     url='https://github.com/soldag/python-pwmled/',
     license='MIT',
     author='soldag',
