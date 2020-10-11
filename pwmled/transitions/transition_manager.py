@@ -21,9 +21,8 @@ class TransitionManager(object, metaclass=Singleton):
         :param transition: The transition
         """
         self._transitions.append(transition)
-        if self._thread is None or not self._thread.isAlive():
-            self._thread = threading.Thread(target=self._transition_loop)
-            self._thread.setDaemon(True)
+        if self._thread is None or not self._thread.is_alive():
+            self._thread = threading.Thread(target=self._transition_loop, daemon=True)
             self._thread.start()
 
     def _transition_loop(self):
