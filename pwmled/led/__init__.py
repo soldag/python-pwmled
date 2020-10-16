@@ -1,7 +1,5 @@
 """Simple led controller."""
 
-from functools import partial
-
 from pwmled.transitions.transition import Transition
 from pwmled.transitions.transition_manager import TransitionManager
 
@@ -55,6 +53,18 @@ class SimpleLed:
         """
         self.set(brightness=brightness)
 
+    @property
+    def state(self):
+        """
+        State property.
+
+        :return: The current state of the led.
+        """
+        return dict(
+            is_on=self.is_on,
+            brightness=self.brightness,
+        )
+
     def set(self, is_on=None, brightness=None, cancel_transition=True):
         """
         Set properties of the led simultaneously before updating pwm values.
@@ -98,119 +108,40 @@ class SimpleLed:
 
         return [brightness]
 
-    def transition(self, duration, is_on=None, **kwargs):
+    def transition(self, duration, **dest_state):
         """
         Transition to the specified state of the led.
 
         If another transition is already running, it is aborted.
 
         :param duration: The duration of the transition.
-        :param is_on: The on-off state to transition to.
-        :param kwargs: The state to transition to.
+        :param dest_state: The state to transition to.
         """
+        self._assert_is_valid_state(dest_state)
+
         self._cancel_active_transition()
-
-        dest_state = self._prepare_transition(is_on, **kwargs)
-        total_steps = self._transition_steps(**dest_state)
-        state_stages = [self._transition_stage(step, total_steps, **dest_state)
-                        for step in range(total_steps)]
-        pwm_stages = [self._get_pwm_values(**stage)
-                      for stage in state_stages]
-        callback = partial(self._transition_callback, is_on)
-        self._active_transition = Transition(self._driver, duration,
-                                             state_stages, pwm_stages,
-                                             callback)
-
-        TransitionManager().execute(self._active_transition)
-
-        return self._active_transition
+        return TransitionManager().execute(Transition(
+            self,
+            duration,
+            self.state,
+            dest_state,
+        ))
 
     def _cancel_active_transition(self):
         if self._active_transition:
             self._active_transition.cancel()
             self._active_transition = None
 
-    def _transition_callback(self, is_on, transition):
+    @classmethod
+    def _assert_is_valid_state(cls, value):
         """
-        Callback that is called when a transition has ended.
+        Assert that the given value is a valid state object.
 
-        :param is_on: The on-off state to transition to.
-        :param transition: The transition that has ended.
+        :param value: The value to check.
         """
-        # Update state properties
-        if transition.state_stages:
-            state = transition.state_stages[transition.stage_index]
-            if self.is_on and is_on is False:
-                # If led was turned off, set brightness to initial value
-                # so that the brightness is restored when it is turned on again
-                state['brightness'] = self.brightness
-            self.set(is_on=is_on, cancel_transition=False, **state)
-
-        self._active_transition = None
-
-    def _prepare_transition(self, is_on=None, **kwargs):
-        """
-        Perform pre-transition tasks and construct the destination state.
-
-        :param is_on: The on-off state to transition to.
-        :param kwargs: The state to transition to.
-        :return: The destination state of the transition.
-        """
-        # Handle transitions with changing on-off-state
-        dest_state = kwargs.copy()
-        if is_on is not None:
-            if is_on and not self.is_on:
-                if 'brightness' not in kwargs or kwargs['brightness'] is None:
-                    dest_state['brightness'] = self.brightness
-                self.set(brightness=0, cancel_transition=False)
-            elif not is_on and self.is_on:
-                dest_state['brightness'] = 0
-
-        return dest_state
-
-    def _transition_steps(self, brightness=None):
-        """
-        Get the maximum number of steps needed for a transition.
-
-        :param brightness: The brightness to transition to (0.0-1.0).
-        :return: The maximum number of steps.
-        """
+        brightness = value.get('brightness')
         if brightness is not None:
-            self._assert_is_brightness(brightness)
-            return self._driver.steps(self.brightness, brightness)
-
-        return 0
-
-    def _transition_stage(self, step, total_steps, brightness=None):
-        """
-        Get a transition stage at a specific step.
-
-        :param step: The current step.
-        :param total_steps: The total number of steps.
-        :param brightness: The brightness to transition to (0.0-1.0).
-        :return: The stage at the specific step.
-        """
-        if brightness is not None:
-            self._assert_is_brightness(brightness)
-            brightness = self._interpolate(self.brightness, brightness,
-                                           step, total_steps)
-
-        return {'brightness': brightness}
-
-    @staticmethod
-    def _interpolate(start, end, step, total_steps):
-        """
-        Interpolate a value from start to end at a given progress.
-
-        :param start: The start value.
-        :param end: The end value.
-        :param step: The current step.
-        :param total_steps: The total number of steps.
-        :return: The interpolated value at the given progress.
-        """
-        diff = end - start
-        progress = step / (total_steps - 1)
-        return start + progress * diff
+            cls._assert_is_brightness(brightness)
 
     @staticmethod
     def _assert_is_brightness(value):

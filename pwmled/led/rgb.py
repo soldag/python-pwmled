@@ -33,6 +33,18 @@ class RgbLed(SimpleLed):
         """
         self.set(color=color)
 
+    @property
+    def state(self):
+        """
+        State property.
+
+        :return: The current state of the led.
+        """
+        return dict(
+            **super().state,
+            color=self.color,
+        )
+
     def set(self, is_on=None, brightness=None, color=None,
             cancel_transition=True):
         """
@@ -69,70 +81,18 @@ class RgbLed(SimpleLed):
 
         return [(x / 255) * brightness for x in color]
 
-    def _prepare_transition(self, is_on=None, brightness=None, color=None):
+    @classmethod
+    def _assert_is_valid_state(cls, value):
         """
-        Perform pre-transition tasks and construct the destination state.
+        Assert that the given value is a valid state object.
 
-        :param is_on: The on-off state to transition to.
-        :param brightness: The brightness to transition to (0.0-1.0).
-        :param color: The color to transition to.
-        :return: The destination state of the transition.
+        :param value: The value to check.
         """
-        dest_state = super()._prepare_transition(is_on,
-                                                 brightness=brightness,
-                                                 color=color)
+        super()._assert_is_valid_state(value)
 
-        # Handle transitions from off to on and changing color
-        if is_on and not self.is_on and color is not None:
-            self.set(color=color, cancel_transition=False)
-
-        return dest_state
-
-    def _transition_steps(self, brightness=None, color=None):
-        """
-        Get the maximum number of steps needed for a transition.
-
-        :param brightness: The brightness to transition to (0.0-1.0).
-        :param color: The color to transition to.
-        :return: The maximum number of steps.
-        """
-        values = []
-        if brightness is not None:
-            self._assert_is_brightness(brightness)
-            values.append((self.brightness, brightness))
-
+        color = value.get('color')
         if color is not None:
-            self._assert_is_color(color)
-            values += [(self.color[i] / 255, color[i] / 255) for i in range(3)]
-
-        if not values:
-            return 0
-
-        return max(self._driver.steps(*args) for args in values)
-
-    def _transition_stage(self, step, total_steps,
-                          brightness=None, color=None):
-        """
-        Get a transition stage at a specific step.
-
-        :param step: The current step.
-        :param total_steps: The total number of steps.
-        :param brightness: The brightness to transition to (0.0-1.0).
-        :param color: The color to transition to.
-        :return: The stage at the specific step.
-        """
-        if brightness is not None:
-            self._assert_is_brightness(brightness)
-            brightness = self._interpolate(self.brightness, brightness,
-                                           step, total_steps)
-
-        if color is not None:
-            self._assert_is_color(color)
-            color = Color(*[self._interpolate(self.color[i], color[i],
-                                              step, total_steps)
-                            for i in range(3)])
-
-        return {'brightness': brightness, 'color': color}
+            cls._assert_is_color(color)
 
     @staticmethod
     def _assert_is_color(value):

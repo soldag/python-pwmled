@@ -83,42 +83,6 @@ class Driver:
         """
         return int(round(value * self._max_raw_value))
 
-    def _to_uniform_pwm(self, values):
-        """
-        Convert raw pwm values to uniform values.
-
-        :param values: The raw pwm values.
-        :return: Converted, uniform pwm values (0.0-1.0).
-        """
-        return [self._to_single_uniform_pwm(values[i])
-                for i in range(len(self._pins))]
-
-    def _to_single_uniform_pwm(self, value):
-        """
-        Convert a single raw pwm value to uniform value.
-
-        :param value: The raw pwm value.
-        :return: Converted, uniform pwm value (0.0-1.0).
-        """
-        return value / self._max_raw_value
-
-    def steps(self, start, end):
-        """
-        Get the maximum number of steps the driver needs for a transition.
-
-        :param start: The start value as uniform pwm value (0.0-1.0).
-        :param end: The end value as uniform pwm value (0.0-1.0).
-        :return: The maximum number of steps.
-        """
-        if not 0 <= start <= 1:
-            raise ValueError('Values must be between 0 and 1.')
-        if not 0 <= end <= 1:
-            raise ValueError('Values must be between 0 and 1.')
-
-        raw_start = self._to_single_raw_pwm(start)
-        raw_end = self._to_single_raw_pwm(end)
-        return abs(raw_start - raw_end)
-
     def stop(self):
         """Stop the driver and release resources."""
         self._stop()
