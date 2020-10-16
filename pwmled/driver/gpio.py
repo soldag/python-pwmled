@@ -15,7 +15,7 @@ class GpioDriver(Driver):
 
         :param pins: The pin numbers, that should be controlled.
         :param freq: The pwm frequency.
-        :param host: The host name of the Pi on which the pigpio daemon is running.
+        :param host: The host name of the Pi on which the pigpio is running.
         """
         super().__init__(pins, self.RESOLUTION, freq)
 
