@@ -30,8 +30,9 @@ class GpioDriver(Driver):
 
         :param raw_values: Raw values to set (0-255).
         """
-        for i in range(len(self._pins)):
-            self._pi.set_PWM_dutycycle(self._pins[i], raw_values[i])
+        for pin, value in zip(self._pins, raw_values):
+            if self._pi.get_PWM_dutycycle(pin) != value:
+                self._pi.set_PWM_dutycycle(pin, value)
 
     def _stop(self):
         """Stop the driver and release resources."""

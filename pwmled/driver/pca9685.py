@@ -31,9 +31,10 @@ class Pca9685Driver(Driver):
 
         :param raw_values: Raw values to set (0-65535).
         """
-        for i in range(len(self._pins)):
-            channel = self._device.channels[self._pins[i]]
-            channel.duty_cycle = raw_values[i]
+        for pin, value in zip(self._pins, raw_values):
+            channel = self._device.channels[pin]
+            if channel.duty_cycle != value:
+                channel.duty_cycle = value
 
     def _stop(self):
         """Stop the driver and release resources."""
