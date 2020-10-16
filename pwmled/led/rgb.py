@@ -1,6 +1,4 @@
 """RGB led controller."""
-from __future__ import division
-
 from pwmled import Color
 from pwmled.led import SimpleLed
 
