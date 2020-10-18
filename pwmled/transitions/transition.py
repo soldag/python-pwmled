@@ -24,7 +24,7 @@ class Transition:
 
         self._cancelled = False
         self._finish_event = threading.Event()
-        self._start_time = time.time()
+        self._start_time = time.perf_counter()
 
     @property
     def duration(self):
@@ -45,7 +45,7 @@ class Transition:
         if self._duration == 0:
             return 1
 
-        run_time = time.time() - self._start_time
+        run_time = time.perf_counter() - self._start_time
         return max(0, min(1, run_time / self._duration))
 
     @property

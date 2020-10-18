@@ -34,12 +34,12 @@ class TransitionManager(object, metaclass=Singleton):
     def _transition_loop(self):
         """Execute all queued transitions step by step."""
         while self._transitions:
-            start = time.time()
+            start = time.perf_counter()
             for transition in self._transitions:
                 transition.step()
                 if transition.finished:
                     self._transitions.remove(transition)
 
-            time_delta = time.time() - start
+            time_delta = time.perf_counter() - start
             sleep_time = max(0, self.MIN_STEP_TIME - time_delta)
             time.sleep(sleep_time)
