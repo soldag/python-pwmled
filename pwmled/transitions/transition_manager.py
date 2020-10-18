@@ -7,7 +7,7 @@ from singleton import Singleton
 class TransitionManager(object, metaclass=Singleton):
     """Represents a manager that executes transitions in a separate thread."""
 
-    MIN_STEP_TIME = 0.001
+    STEP_TIME = 0.001
 
     def __init__(self):
         """Initialize the manager."""
@@ -34,12 +34,9 @@ class TransitionManager(object, metaclass=Singleton):
     def _transition_loop(self):
         """Execute all queued transitions step by step."""
         while self._transitions:
-            start = time.perf_counter()
             for transition in self._transitions:
                 transition.step()
                 if transition.finished:
                     self._transitions.remove(transition)
 
-            time_delta = time.perf_counter() - start
-            sleep_time = max(0, self.MIN_STEP_TIME - time_delta)
-            time.sleep(sleep_time)
+            time.sleep(self.STEP_TIME)
