@@ -71,6 +71,10 @@ class Transition:
         if self.cancelled or self.finished:
             return
 
+        if self.progress == 1:
+            self._finish()
+            return
+
         state = {}
         src_is_on = self._src_state.get('is_on')
         dest_is_on = self._dest_state.get('is_on')
@@ -102,9 +106,6 @@ class Transition:
             ))
 
         self._led.set(**state, cancel_transition=False)
-
-        if self.progress == 1:
-            self._finish()
 
     def _interpolate(self, start, end):
         """
