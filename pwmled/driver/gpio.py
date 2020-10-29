@@ -23,9 +23,9 @@ class GpioDriver(Driver):
             self._pi = pigpio.pi(host)
         else:
             self._pi = pigpio.pi()
-        # set frequency
-        for i in range(len(self._pins)):
-            self._pi.set_PWM_frequency(self._pins[i], self._freq)
+
+        for pin in self._pins:
+            self._pi.set_PWM_frequency(pin, freq)
 
     def _set_pwm(self, raw_values):
         """
