@@ -6,7 +6,7 @@ with open('README.md', 'r') as f:
 
 setup(
     name='pwmled',
-    version='1.6.3',
+    version='1.6.4',
     description='Control LEDs connected to a micro controller using pwm.',
     long_description=long_description,
     long_description_content_type='text/markdown',
