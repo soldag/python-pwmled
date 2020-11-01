@@ -1,7 +1,12 @@
 """PCA9685 pwm driver."""
-import board
 import busio
 import adafruit_pca9685
+from adafruit_blinka.agnostic import board_id
+try:
+    import board
+except NotImplementedError:
+    # Defer raising error to initialization of Pca9685Driver class
+    board = None
 
 from pwmled.driver import Driver
 
@@ -20,6 +25,12 @@ class Pca9685Driver(Driver):
         :param address: The address of the PCA9685.
         """
         super().__init__(pins, self.RESOLUTION, freq)
+
+        # Raise error if board couldn't be imported
+        if not board:
+            if not board_id:
+                raise NotImplementedError('Board is unknown')
+            raise NotImplementedError(f'Board "{board_id}" is not supported')
 
         i2c = busio.I2C(board.SCL, board.SDA)
         self._device = adafruit_pca9685.PCA9685(i2c, address=address)
