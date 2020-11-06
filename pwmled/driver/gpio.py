@@ -34,7 +34,15 @@ class GpioDriver(Driver):
         :param raw_values: Raw values to set (0-255).
         """
         for pin, value in zip(self._pins, raw_values):
-            if self._pi.get_PWM_dutycycle(pin) != value:
+            try:
+                current_value = self._pi.get_PWM_dutycycle(pin)
+            except pigpio.error as error:
+                if error.value == 'GPIO is not in use for PWM':
+                    current_value = 0
+                else:
+                    raise
+
+            if current_value != value:
                 self._pi.set_PWM_dutycycle(pin, value)
 
     def _stop(self):
