@@ -20,7 +20,9 @@ class GpioDriver(Driver):
         """
         super().__init__(pins, self.RESOLUTION, freq)
 
-        self._pi = pigpio.pi(host, port)
+        self._pi = pigpio.pi(host, port, show_errors=False)
+        if not self._pi.connected:
+            raise ConnectionError('Could not connect to the pigpio daemon')
 
         for pin in self._pins:
             self._pi.set_PWM_frequency(pin, freq)

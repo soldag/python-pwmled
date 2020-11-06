@@ -16,7 +16,7 @@ setup(
     author_email='soren.oldag@gmail.com',
     packages=find_packages(),
     install_requires=[
-        'pigpio==1.35',
+        'pigpio==1.78',
         'adafruit-blinka==5.5.1',
         'adafruit-circuitpython-pca9685==3.3.2',
         'python-singleton==0.1.2',
