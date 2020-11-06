@@ -1,6 +1,6 @@
 # python-pwmled [![PyPI version](https://badge.fury.io/py/pwmled.svg)](https://badge.fury.io/py/pwmled)
 
-`python-pwmled` controls LEDs connected to a micro controller using pulse-width modulation. It supports one-color, RGB and RGBW leds driven by GPIOs of an Raspberry Pi or a PCA9685 controller. 
+`python-pwmled` controls LEDs connected to a micro controller using pulse-width modulation. It supports one-color, RGB and RGBW leds driven by GPIOs of an Raspberry Pi or a PCA9685 controller.
 
 # Installation
 `python-pwmled` requires Python 3. It can be installed using pip:
@@ -34,8 +34,8 @@ from pwmled.driver.pca9685 import Pca9685Driver
 # GPIO driver, which controls pins 17, 22, 23
 driver = GpioDriver([17, 22, 23])
 driver = GpioDriver([17, 22, 23], freq=200)
-# To control the pigpio on a other machine use the host parameter
-driver = GpioDriver([17, 22, 23], host='other.host')
+# To control the pigpio on a other machine use the host and port parameter
+driver = GpioDriver([17, 22, 23], host='other.host', port=8889)
 
 # PCA9685 driver which controls pins 1, 2, 3
 driver = Pca9685Driver([1, 2, 3])
