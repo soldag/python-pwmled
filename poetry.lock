@@ -1,0 +1,166 @@
+[[package]]
+name = "adafruit-blinka"
+version = "6.15.0"
+description = "CircuitPython APIs for non-CircuitPython versions of Python such as CPython on Linux and MicroPython."
+category = "main"
+optional = false
+python-versions = ">=3.6.0"
+
+[package.dependencies]
+Adafruit-PlatformDetect = ">=3.13.0"
+Adafruit-PureIO = ">=1.1.7"
+pyftdi = ">=0.40.0"
+
+[[package]]
+name = "adafruit-circuitpython-busdevice"
+version = "5.1.1"
+description = "CircuitPython bus device classes to manage bus sharing."
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+Adafruit-Blinka = "*"
+
+[[package]]
+name = "adafruit-circuitpython-pca9685"
+version = "3.4.0"
+description = "CircuitPython driver for motor, stepper, and servo based on PCA9685."
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+Adafruit-Blinka = "*"
+adafruit-circuitpython-busdevice = "*"
+adafruit-circuitpython-register = "*"
+
+[[package]]
+name = "adafruit-circuitpython-register"
+version = "1.9.7"
+description = "CircuitPython data descriptor classes to represent hardware registers on I2C and SPI devices."
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
+name = "adafruit-platformdetect"
+version = "3.19.4"
+description = "Platform detection for use by libraries like Adafruit-Blinka."
+category = "main"
+optional = false
+python-versions = ">=3.6.0"
+
+[[package]]
+name = "adafruit-pureio"
+version = "1.1.9"
+description = "Pure python (i.e. no native extensions) access to Linux IO    including I2C and SPI. Drop in replacement for smbus and spidev modules."
+category = "main"
+optional = false
+python-versions = ">=3.5.0"
+
+[[package]]
+name = "pigpio"
+version = "1.78"
+description = "Raspberry Pi GPIO module"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
+name = "pyftdi"
+version = "0.53.3"
+description = "FTDI device driver (pure Python)"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+pyserial = ">=3.0"
+pyusb = ">=1.0.0,<1.2.0 || >1.2.0"
+
+[[package]]
+name = "pyserial"
+version = "3.5"
+description = "Python Serial Port Extension"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.extras]
+cp2110 = ["hidapi"]
+
+[[package]]
+name = "python-singleton"
+version = "0.1.2"
+description = "Singleton Metaclass."
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+six = "*"
+
+[[package]]
+name = "pyusb"
+version = "1.2.1"
+description = "Python USB access module"
+category = "main"
+optional = false
+python-versions = ">=3.6.0"
+
+[[package]]
+name = "six"
+version = "1.16.0"
+description = "Python 2 and 3 compatibility utilities"
+category = "main"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
+
+[metadata]
+lock-version = "1.1"
+python-versions = "^3.6"
+content-hash = "3d718aec480a1f285df3b8068d8f69d56d3fb7dc56c3610927d3c6765aba3283"
+
+[metadata.files]
+adafruit-blinka = [
+    {file = "Adafruit-Blinka-6.15.0.tar.gz", hash = "sha256:2df80c4cbcd17a8b625e21216bfd0f05b344e20f37080c0893416085a62971d9"},
+]
+adafruit-circuitpython-busdevice = [
+    {file = "adafruit-circuitpython-busdevice-5.1.1.tar.gz", hash = "sha256:27049b07a3d6cdc6646bfe950ab1465604d898454b0fd9d893fd2c5294551506"},
+]
+adafruit-circuitpython-pca9685 = [
+    {file = "adafruit-circuitpython-pca9685-3.4.0.tar.gz", hash = "sha256:8a6499ed7af7c315265d166651d1553ae4ce83eb2ed78ba22f6d0daa34f2b225"},
+]
+adafruit-circuitpython-register = [
+    {file = "adafruit-circuitpython-register-1.9.7.tar.gz", hash = "sha256:ee82a0aa94cf9dc12bc3c24b892323372d3b2e1b8b8e1cbc2498bcdea0e7dc71"},
+]
+adafruit-platformdetect = [
+    {file = "Adafruit-PlatformDetect-3.19.4.tar.gz", hash = "sha256:6ffb809ab15d02d997523696d37f2629e660587092204cc266f0b2ffd677821c"},
+]
+adafruit-pureio = [
+    {file = "Adafruit_PureIO-1.1.9.tar.gz", hash = "sha256:2caf22fb07c7f771d83267f331a76cde314723f884a9570ea6f768730c87a879"},
+]
+pigpio = [
+    {file = "pigpio-1.78-py2.py3-none-any.whl", hash = "sha256:81e46f640c4e6342881fa9bbe290dbcd4fc179619dc6591e57a9d4a084dc49fa"},
+    {file = "pigpio-1.78.tar.gz", hash = "sha256:91efa50e4990649da97408a384782d6ccf58342fc59cdfe21ed7a42911569975"},
+]
+pyftdi = [
+    {file = "pyftdi-0.53.3-py3-none-any.whl", hash = "sha256:6e86880ec6d66389de643ca83de5d59fffea3bd334f492e12fab71a832f878a2"},
+    {file = "pyftdi-0.53.3.tar.gz", hash = "sha256:4ef20c246bdb0f278d283337d7a6e69cf9bdb0ead525e7ad867d9e46ad26e613"},
+]
+pyserial = [
+    {file = "pyserial-3.5-py2.py3-none-any.whl", hash = "sha256:c4451db6ba391ca6ca299fb3ec7bae67a5c55dde170964c7a14ceefec02f2cf0"},
+    {file = "pyserial-3.5.tar.gz", hash = "sha256:3c77e014170dfffbd816e6ffc205e9842efb10be9f58ec16d3e8675b4925cddb"},
+]
+python-singleton = [
+    {file = "python-singleton-0.1.2.tar.gz", hash = "sha256:8031b7e90153854376ab72c3a895b52872ca2a51289aeb34f050eafc804a6333"},
+]
+pyusb = [
+    {file = "pyusb-1.2.1-py3-none-any.whl", hash = "sha256:2b4c7cb86dbadf044dfb9d3a4ff69fd217013dbe78a792177a3feb172449ea36"},
+    {file = "pyusb-1.2.1.tar.gz", hash = "sha256:a4cc7404a203144754164b8b40994e2849fde1cfff06b08492f12fff9d9de7b9"},
+]
+six = [
+    {file = "six-1.16.0-py2.py3-none-any.whl", hash = "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"},
+    {file = "six-1.16.0.tar.gz", hash = "sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926"},
+]
