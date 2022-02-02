@@ -16,10 +16,10 @@ setup(
     author_email='soren.oldag@gmail.com',
     packages=find_packages(),
     install_requires=[
-        'pigpio==1.78',
-        'adafruit-blinka==5.5.1',
-        'adafruit-circuitpython-pca9685==3.3.2',
-        'python-singleton==0.1.2',
+        'pigpio>=1.78,<2.0',
+        'adafruit-blinka>=5.5.1,<7.0',
+        'adafruit-circuitpython-pca9685>=3.3.2,<4.0',
+        'python-singleton>=0.1.2,<1.0',
     ],
     classifiers=[
         'License :: OSI Approved :: MIT License',
