@@ -19,7 +19,7 @@ include = [
 
 [tool.poetry.dependencies]
 python = "^3.6"
-adafruit-blinka = ">=5.5.1,<7.0"
+adafruit-blinka = ">=5.5.1,<8.0"
 adafruit-circuitpython-pca9685 = ">=3.3.2,<4.0"
 pigpio = ">=1.78,<2.0"
 python-singleton = ">=0.1.2,<1.0"
