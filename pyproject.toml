@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pwmled"
-version = "1.6.9"
+version = "1.6.10"
 description = "Control LEDs connected to a micro controller using pwm."
 authors = ["soldag <soren.oldag@gmail.com>"]
 license = "MIT"
